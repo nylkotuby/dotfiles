@@ -119,7 +119,18 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# if/else needed to solve spacing issue in non-git directories
+parse_git_branch() {
+  GB=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/')
+
+	if [[ -z "$GB" ]]; then
+    echo ""
+  else
+    echo " $GB"
+	fi
+}
+
 PROMPT_DIRTRIM=2
-PS1='\[\033[01;34m\]\w \$\[\033[00m\] '
+PS1='\[\033[01;34m\]\w\[\033[00m\]\[\033[01;37m\]$(parse_git_branch)\[\033[00m\] \[\033[01;34m\]\$\[\033[00m\] '
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
