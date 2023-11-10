@@ -1,0 +1,27 @@
+[user]
+	name = Lyn Kotuby
+	editor = nvim
+
+[alias]
+  all = "!f() { ls | xargs -P10 -I{} git -C {} $1; }; f"
+  c = checkout
+  cb = rev-parse --abbrev-ref HEAD
+  cleanup-merged = "!git branch --merged main | grep  -v '\\*\\|main\\|develop' | xargs git branch -d"
+  d = diff
+  history = "!git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'"
+  inject = "!f() { git commit --fixup=$1; git rebase --interactive --autosquash --autostash $1^; }; GIT_EDITOR=true f"
+  publish = "!git push -u origin $(git cb)"
+  s = switch
+  scf = "!git diff --name-only $(git merge-base origin/main HEAD)"
+  smush = commit --amend --no-edit
+  wcl = diff --shortstat
+[core]
+	excludesFile = ~/.gitignore
+[commit]
+	template = /Users/lynkotuby/.gitmessage
+[pull]
+	rebase = false
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[push]
+	autoSetupRemote = true
