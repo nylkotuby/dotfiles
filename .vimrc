@@ -18,17 +18,18 @@ set lazyredraw
 let mapleader = ","
 nnoremap <C-p> :FZF<CR>
 nnoremap <C-m> :Buffers<CR>
-nnoremap <C-y> :Rg<CR>
+nnoremap <C-Space> :Rg<CR>
 map <C-n> :NERDTreeToggle<CR>
 nnoremap <leader>ntf :NERDTreeFind<CR>
 map Y y$
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" RSpec.vim mappings
-nnoremap <Leader>fs :call RunCurrentSpecFile()<CR>
-nnoremap <Leader>ns :call RunNearestSpec()<CR>
-nnoremap <Leader>ls :call RunLastSpec()<CR>
-nnoremap <Leader>as :call RunAllSpecs()<CR>
+" vim-test mappings
+nnoremap <Leader>fs :TestFile<CR>
+nnoremap <Leader>ns :TestNearest<CR>
+nnoremap <Leader>ls :TestLast<CR>
+nnoremap <Leader>as :TestSuite<CR>
+nnoremap <Leader>rr :TestVisit<CR>
 nnoremap <Leader>qs :call CleanUpRunner()<CR>
 
 function! CleanUpRunner()
@@ -47,16 +48,18 @@ autocmd BufWinLeave * call clearmatches()
 "imap <buffer> <Nul> <C-Space>
 "smap <buffer> <Nul> <C-Space>
 
-" https://github.com/thoughtbot/vim-rspec
 " https://github.com/christoomey/vim-tmux-runner
-let g:rspec_runner = "os_x_iterm"
-"let g:rspec_command = 'VtrSendCommandToRunner! cd $(echo {spec} | awk -F/ '{print F $1}') && rspec $(echo {spec} | cut -d'/' -f2-)'
-let g:rspec_command = 'VtrSendCommandToRunner! bin/rspec {spec}'
+"let g:rspec_runner = "os_x_iterm"
+"let g:rspec_command = "VtrSendCommandToRunner! cd $(echo {spec} | awk -F/ '{print F $1}') && rspec $(echo {spec} | cut -d'/' -f2-)"
+"let g:rspec_command = "VtrSendCommandToRunner! cd $(echo {spec} | awk -F/ '{print F $1}') && export SPEC=$(echo {spec} | cut -d'/' -f2-) && bin/rspec $SPEC"
+"let g:rspec_command = 'VtrSendCommandToRunner! bin/rspec {spec}'
 let g:VtrPercentage = 40
+
+" vim-test
+let test#strategy = "vimux"
 
 call plug#begin()
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'christoomey/vim-tmux-runner'
 Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
 Plug 'junegunn/fzf.vim'
@@ -66,14 +69,16 @@ Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'preservim/nerdtree'
-Plug 'thoughtbot/vim-rspec'
+Plug 'preservim/vimux'
 Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'luochen1990/rainbow'
 Plug 'vim-ruby/vim-ruby'
+Plug 'vim-test/vim-test'
 call plug#end()
 
 let g:fzf_preview_window = ['right:50%', 'ctrl-/']
@@ -161,28 +166,29 @@ local on_attach = function(client, bufnr)
 
 end
 
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
-local servers = { "standardrb", "solargraph" }
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup {
-	  on_attach = on_attach,
-	  flags = {
-	    debounce_text_changes = 150,
-	  }
-  }
-end
-nvim_lsp['solargraph'].setup{
-settings = {
-  solargraph = {
-    autoformat = false,
-    completion = true,
-    diagnostic = false,
-    folding = true,
-    references = true,
-    rename = true,
-    symbols = true
-  }
+  -- Use a loop to conveniently call 'setup' on multiple servers and
+  -- map buffer local keybindings when the language server attaches
+  -- make sure to run `gem install solargraph` and `yard gems`!!!!
+  local servers = { "standardrb", "solargraph" }
+  for _, lsp in ipairs(servers) do
+    nvim_lsp[lsp].setup {
+  	  on_attach = on_attach,
+  	  flags = {
+  	    debounce_text_changes = 150,
+  	  }
+    }
+  end
+  nvim_lsp['solargraph'].setup{
+  settings = {
+    solargraph = {
+      autoformat = false,
+      completion = true,
+      diagnostic = false,
+      folding = true,
+      references = true,
+      rename = true,
+      symbols = true
+    }
   }
 }
 EOF
