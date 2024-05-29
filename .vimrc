@@ -184,12 +184,12 @@ lua << EOF
     -- 	  }
     --   }
     -- end
-    nvim_lsp['standardrb'].setup {
-      on_attach = on_attach,
-      flags = {
-        debounce_text_changes = 150,
-      }
-    }
+    -- nvim_lsp['standardrb'].setup {
+    --   on_attach = on_attach,
+    --   flags = {
+    --     debounce_text_changes = 150,
+    --   }
+    -- }
 
     -- make sure to run `gem install solargraph` and `yard gems`!!!!
     nvim_lsp['solargraph'].setup {
