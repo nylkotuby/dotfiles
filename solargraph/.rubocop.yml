@@ -18,6 +18,10 @@ inherit_gem:
   standard-custom: config/base.yml
   standard-rails: config/base.yml
 
+inherit_from:
+ - .rubocop_todo.yml
+ - .rubocop_strict.yml
+
 AllCops:
   SuggestExtensions: false
   TargetRubyVersion: 3.2
