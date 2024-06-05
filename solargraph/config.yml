@@ -10,7 +10,7 @@ exclude:
 require: []
 domains: []
 reporters:
-- rubocop
+# - rubocop
 - require_not_found
 #formatter:
 #  rubocop:

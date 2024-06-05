@@ -175,21 +175,21 @@ lua << EOF
 
     -- Use a loop to conveniently call 'setup' on multiple servers and
     -- map buffer local keybindings when the language server attaches
-    --local servers = { "standardrb", "solargraph" }
-    -- for _, lsp in ipairs(servers) do
-    --   nvim_lsp[lsp].setup {
-    -- 	  on_attach = on_attach,
-    -- 	  flags = {
-    -- 	    debounce_text_changes = 150,
-    -- 	  }
-    --   }
-    -- end
-    -- nvim_lsp['standardrb'].setup {
-    --   on_attach = on_attach,
-    --   flags = {
-    --     debounce_text_changes = 150,
-    --   }
-    -- }
+    local servers = { "standardrb", "solargraph" }
+     for _, lsp in ipairs(servers) do
+       nvim_lsp[lsp].setup {
+     	  on_attach = on_attach,
+     	  flags = {
+     	    debounce_text_changes = 150,
+     	  }
+       }
+     end
+     nvim_lsp['standardrb'].setup {
+       on_attach = on_attach,
+       flags = {
+         debounce_text_changes = 150,
+       }
+     }
 
     -- make sure to run `gem install solargraph` and `yard gems`!!!!
     nvim_lsp['solargraph'].setup {
