@@ -44,28 +44,13 @@ DISABLE_UPDATE_PROMPT="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git rails gnu-utils)
 
 source $ZSH/oh-my-zsh.sh
 source "/Users/lynkotuby/.gvm/scripts/gvm"
 #[[ -s "~/.gvm/scripts/gvm" ]] && source "~/.gvm/scripts/gvm"
 
-# User configuration
-export TERM=xterm-256color
-
-alias v="nvim"
-alias new-uuid="uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '\n'"
-
-alias r="rake"
-alias be="bundle exec"
-alias ber="bundle exec rake"
-
-function parse_git_branch {
-  name=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
-  if [[ -n $name ]] ; then
-    echo "$name "
-  fi
-}
+# optional multi-lang util
 
 function detect-lang-env {
   if [[ -e go.mod ]]
@@ -87,6 +72,24 @@ add-zsh-hook chpwd detect-lang-env
 autoload -U colors && colors
 autoload -U detect-lang-env && detect-lang-env
 
+# User configuration
+export TERM=xterm-256color
+bindkey -e
+
+alias v="nvim"
+alias g="git"
+alias new-uuid="uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '\n'"
+alias update-chromedriver="cd /opt/homebrew/Caskroom/chromedriver/*/chromedriver-mac-arm64/ && xattr -d com.apple.quarantine chromedriver && cd -"
+
+function parse_git_branch {
+  name=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+  if [[ -n $name ]] ; then
+    echo "$name "
+  fi
+}
+
+autoload -U colors && colors
+
 setopt promptsubst
 PROMPT='%{$fg[green]%}$(parse_git_branch)%{$reset_color%}%1~ %{$fg[yellow]%}♮%{$reset_color%} '
 
@@ -99,8 +102,12 @@ fi
 
 # TODO - source company-specific vars in ~/.companyrc here
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# suppress direnv output
+export DIRENV_LOG_FORMAT=
+eval "$(direnv hook zsh)"
 
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+. "/Users/lyn/.asdf/asdf.sh"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
