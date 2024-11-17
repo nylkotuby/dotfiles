@@ -56,14 +56,9 @@ autocmd BufWinLeave * call clearmatches()
 let g:VtrPercentage = 40
 
 " vim-test
-" let test#project_root = '~/code/ha/core/workshop'
+"  let test#project_root = "~/code/todo/todo"
 let test#strategy = "vimux"
-
-"function! SSD()
-"  let projdir = vim.fn.system('pwd', '|', 'awk', '-F/', \"'{print F $7}'\")
-"  let test#project_root = \"~/code/ha/core/\" . a:projdir
-"endfunction
-
+let g:VimuxHeight = "40%"
 
 call plug#begin()
 Plug 'christoomey/vim-tmux-navigator'
@@ -88,7 +83,7 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'vim-test/vim-test'
 call plug#end()
 
-let g:fzf_preview_window = ['right:50%', 'ctrl-/']
+let g:fzf_preview_window = ['down:40%', 'ctrl-/']
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \   'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
