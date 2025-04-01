@@ -1,12 +1,21 @@
 ## install
 How to get all this working.
 
+## Set up shell
+For OSX, I did `kitty` this time.
+
+* Download kitty
+* Download `Input` monospaced font, add to Font book, and do `kitten choose-font`
+* `kitten theme` -> jellybeans
+* Install brew, git, get ssh key set up
+
 ### Install needed apps
 On Ubuntu, some of these will be available via `apt`, but most will need to be installed by cloning the git repo.
 OSX has some, but not all, available via `brew`. Google 'em.
 
 ```
 neovim
+tmux
 zsh
 oh-my-zsh
 asdf
@@ -14,6 +23,10 @@ vim-plug
 fzf
 rg
 ```
+
+For OSX, install `reattach-to-user-namespace` before launching tmux.
+For Ubuntu/WSL, remove the `reattach-to-user-namespace` call before launching tmux.
+Not doing either one will result in tmux exiting on startup. :)
 
 ### Ruby dependencies
 For Ubuntu, you'll need to install these dependencies in order to build Ruby:
@@ -30,6 +43,9 @@ libreadline-dev
 ```
 
 You might also need `libtool`, but `psych` should be covered by `libyaml`.
+
+For OSX, install `libyaml` via brew to get `psych` to work.
+
 
 ### Install ruby & gems
 To install Ruby:
