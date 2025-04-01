@@ -16,12 +16,14 @@ set ignorecase
 set lazyredraw
 
 let mapleader = ","
-nnoremap <C-p> :FZF<CR>
-nnoremap <C-m> :Buffers<CR>
-nnoremap <C-Space> :Rg<CR>
+" Find files using Telescope command-line sugar.
+nnoremap <C-p> <cmd>Telescope find_files<cr>
+nnoremap <C-Space> <cmd>Telescope live_grep<cr>
+nnoremap <C-m> <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
 map <C-n> :NERDTreeToggle<CR>
 nnoremap <leader>ntf :NERDTreeFind<CR>
-map Y y$
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " vim-test mappings
@@ -43,16 +45,6 @@ autocmd InsertEnter * match Error /\s\+\%#\@<!$/
 autocmd InsertLeave * match Error /\s\+$/
 autocmd BufWinLeave * call clearmatches()
 
-" Next three lines are to enable C-Space to autocomplete, omnicomplete
-"inoremap <C-Space> <C-x><C-o>
-"imap <buffer> <Nul> <C-Space>
-"smap <buffer> <Nul> <C-Space>
-
-" https://github.com/christoomey/vim-tmux-runner
-"let g:rspec_runner = \"os_x_iterm\"
-"let g:rspec_command = \"VtrSendCommandToRunner! cd $(echo {spec} | awk -F/ '{print F $1}') && rspec $(echo {spec} | cut -d'/' -f2-)\"
-"let g:rspec_command = \"VtrSendCommandToRunner! cd $(echo {spec} | awk -F/ '{print F $1}') && export SPEC=$(echo {spec} | cut -d'/' -f2-) && bin/rspec $SPEC\"
-"let g:rspec_command = 'VtrSendCommandToRunner! bin/rspec {spec}'
 let g:VtrPercentage = 40
 
 " vim-test
@@ -64,12 +56,16 @@ call plug#begin()
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
-Plug 'junegunn/fzf.vim'
+"Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
-Plug 'junegunn/fzf', { 'dir': '~/opt/fzf' }
+"Plug 'junegunn/fzf', { 'dir': '~/opt/fzf' }
 Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+Plug 'nvim-telescope/telescope-fzf-native.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'preservim/nerdtree'
 Plug 'preservim/vimux'
 Plug 'tpope/vim-bundler'
