@@ -23,7 +23,6 @@ nnoremap <C-p> <cmd>Telescope find_files<cr>
 nnoremap <C-Space> <cmd>Telescope live_grep<cr>
 nnoremap <C-m> <cmd>Telescope buffers<cr>
 nnoremap <leader><space> <cmd>Telescope grep_string<cr>
-nnoremap <C-j> <cmd>Telescope buffers<cr>
 
 " nerdtree
 map <C-n> :NERDTreeToggle<CR>
@@ -133,6 +132,7 @@ autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 " https://blog.backtick.consulting/neovims-built-in-lsp-with-ruby-and-rails/
 
 lua << EOF
+  -- alternatively, try virtual_lines
   vim.diagnostic.config({virtual_text=true})
 
   local nvim_lsp = require('lspconfig')
