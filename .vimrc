@@ -133,6 +133,8 @@ autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 " https://blog.backtick.consulting/neovims-built-in-lsp-with-ruby-and-rails/
 
 lua << EOF
+  vim.diagnostic.config({virtual_text=true})
+
   local nvim_lsp = require('lspconfig')
 
   -- Use an on_attach function to only map the following keys
@@ -161,8 +163,8 @@ lua << EOF
     buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     --buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-    --buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    --buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     -- buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 end
@@ -171,9 +173,12 @@ end
   nvim_lsp['sorbet'].setup {
     on_attach = on_attach,
     cmd = { "bundle", "exec", "srb", "tc", "--lsp" },
-  	flags = { debounce_text_changes = 150 }
+    flags = { debounce_text_changes = 150 }
   }
 
+  nvim_lsp['rubocop'].setup {
+    cmd = { "bundle", "exec", "rubocop", "--lsp" },
+  }
 
   require("telescope").setup({
     defaults = {
