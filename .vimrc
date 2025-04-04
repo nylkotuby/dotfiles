@@ -14,14 +14,18 @@ set splitbelow
 set splitright
 set ignorecase
 set lazyredraw
+set nofoldenable
 
 let mapleader = ","
+
 " Find files using Telescope command-line sugar.
 nnoremap <C-p> <cmd>Telescope find_files<cr>
 nnoremap <C-Space> <cmd>Telescope live_grep<cr>
 nnoremap <C-m> <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader><space> <cmd>Telescope grep_string<cr>
+nnoremap <C-j> <cmd>Telescope buffers<cr>
 
+" nerdtree
 map <C-n> :NERDTreeToggle<CR>
 nnoremap <leader>ntf :NERDTreeFind<CR>
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -56,9 +60,8 @@ call plug#begin()
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
-"Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
-"Plug 'junegunn/fzf', { 'dir': '~/opt/fzf' }
+Plug 'MunifTanjim/nui.nvim'
 Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
@@ -161,44 +164,24 @@ lua << EOF
     --buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
     --buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     -- buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-    buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  end
+    -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+end
 
-    -- Use a loop to conveniently call 'setup' on multiple servers and
-    -- map buffer local keybindings when the language server attaches
-    local servers = { "standardrb", "solargraph" }
-     for _, lsp in ipairs(servers) do
-       nvim_lsp[lsp].setup {
-     	  on_attach = on_attach,
-     	  flags = {
-     	    debounce_text_changes = 150,
-     	  }
-       }
-     end
-     nvim_lsp['standardrb'].setup {
-       on_attach = on_attach,
-       flags = {
-         debounce_text_changes = 150,
-       }
-     }
+  -- run `gem install sorbet` for first-time setup
+  nvim_lsp['sorbet'].setup {
+    on_attach = on_attach,
+    cmd = { "bundle", "exec", "srb", "tc", "--lsp" },
+  	flags = { debounce_text_changes = 150 }
+  }
 
-    -- make sure to run `gem install solargraph` and `yard gems`!!!!
-    nvim_lsp['solargraph'].setup {
-      on_attach = on_attach,
-      flags = {
-        debounce_text_changes = 150,
+
+  require("telescope").setup({
+    defaults = {
+      layout_strategy = 'flex',
+      layout_config = {
+        horizontal = { preview_cutoff = 1 },
+        vertical = { preview_cutoff = 1 },
       },
-      settings = {
-        solargraph = {
-          autoformat = false,
-          completion = true,
-          diagnostic = false,
-          folding = true,
-          formatting = true,
-          references = true,
-          rename = true,
-          symbols = true
-        }
-      }
-    }
+    },
+  })
 EOF
