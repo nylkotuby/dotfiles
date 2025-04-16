@@ -172,7 +172,7 @@ end
   -- run `gem install sorbet` for first-time setup
   nvim_lsp['sorbet'].setup {
     on_attach = on_attach,
-    cmd = { "bundle", "exec", "srb", "tc", "--lsp" },
+    cmd = { "bundle", "exec", "srb", "tc", "--lsp"},
     flags = { debounce_text_changes = 150 }
   }
 
@@ -180,13 +180,50 @@ end
     cmd = { "bundle", "exec", "rubocop", "--lsp" },
   }
 
+  -- run `brew install terraform`
+  nvim_lsp['terraformls'].setup {}
+
+  -- run `npm install -g @ember-tooling/ember-language-server` for first-time setup
+  nvim_lsp['ember'].setup {
+    on_attach = on_attach,
+    cmd = { "ember-language-server", "--stdio" },
+    filetypes = { "handlebars", "typescript", "javascript", "typescript.glimmer", "javascript.glimmer" },
+    root_dir = require('lspconfig.util').root_pattern("ember-cli-build.js", ".git")
+  }
+
   require("telescope").setup({
     defaults = {
-      layout_strategy = 'flex',
+      layout_strategy = 'vertical',
       layout_config = {
         horizontal = { preview_cutoff = 1 },
         vertical = { preview_cutoff = 1 },
       },
+      file_ignore_patterns = { "%.rbi" }, -- compiled sorbet interfaces
+      mappings = {
+        i = {
+          ["<esc>"] = require("telescope.actions").close,
+          ["<C-k>"] = require("telescope.actions").move_selection_previous,
+          ["<C-j>"] = require("telescope.actions").move_selection_next,
+        },
+      },
+    },
+    pickers = {
+      ["buffers"] = { sort_mru = true, ignore_current_buffer = true },
     },
   })
+
+  require'nvim-treesitter.configs'.setup {
+    highlight = {
+      enable = true,
+      -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+      -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+      -- Using this option may slow down your editor, and you may see some duplicate highlights.
+      -- Instead of true it can also be a list of languages
+      additional_vim_regex_highlighting = false,
+    },
+  }
 EOF
+
+autocmd BufWritePre *.tfvars lua vim.lsp.buf.format()
+autocmd BufWritePre *.tf lua vim.lsp.buf.format()
+"autocmd ColorScheme * runtime plugin/diagnostic.vim
