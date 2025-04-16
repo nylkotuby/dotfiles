@@ -61,6 +61,10 @@ solargraph
 standard
 ```
 
+Really, just go through the `init.nvim` and install all the gems/dependencies called out in the comments.
+
+Also, whatever languages you use, don't forget to `:TSInstall` for [TreeSitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#supported-languages) to have the parser ready.
+
 ### Configure files
 Link or copy the files like so.
 
