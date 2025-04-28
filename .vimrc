@@ -35,20 +35,12 @@ nnoremap <Leader>ns :TestNearest<CR>
 nnoremap <Leader>ls :TestLast<CR>
 nnoremap <Leader>as :TestSuite<CR>
 nnoremap <Leader>rr :TestVisit<CR>
-nnoremap <Leader>qs :call CleanUpRunner()<CR>
-
-function! CleanUpRunner()
-  VtrAttachToPane
-  VtrKillRunner
-endfunction
 
 " Highlight extraneous whitespace
 autocmd BufWinEnter * match Error /\s\+$/
 autocmd InsertEnter * match Error /\s\+\%#\@<!$/
 autocmd InsertLeave * match Error /\s\+$/
 autocmd BufWinLeave * call clearmatches()
-
-let g:VtrPercentage = 40
 
 " vim-test
 "  let test#project_root = "~/code/todo/todo"
@@ -61,12 +53,14 @@ Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
 Plug 'junegunn/goyo.vim'
 Plug 'MunifTanjim/nui.nvim'
-Plug 'nanotech/jellybeans.vim'
+Plug 'rktjmp/lush.nvim'
+Plug 'adisen99/codeschool.nvim'
+"Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
-Plug 'nvim-telescope/telescope-fzf-native.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'preservim/nerdtree'
 Plug 'preservim/vimux'
@@ -81,16 +75,8 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'vim-test/vim-test'
 call plug#end()
 
-let g:fzf_preview_window = ['down:40%', 'ctrl-/']
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
-  \   fzf#vim#with_preview(), <bang>0)
-
-colorscheme jellybeans
 let g:rainbow_active = 1
 let g:lightline = {
-      \ 'colorscheme': 'jellybeans',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'filename', 'modified' ] ],
@@ -210,9 +196,21 @@ end
     pickers = {
       ["buffers"] = { sort_mru = true, ignore_current_buffer = true },
     },
+    extensions = {
+      fzf = {
+        fuzzy = true,                    -- false will only do exact matching
+        override_generic_sorter = true,  -- override the generic sorter
+        override_file_sorter = true,     -- override the file sorter
+        case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+        -- the default case_mode is "smart_case"
+      }
+    }
   })
 
+  require('telescope').load_extension('fzf')
+
   require'nvim-treesitter.configs'.setup {
+    auto_install = true,
     highlight = {
       enable = true,
       -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
@@ -222,6 +220,35 @@ end
       additional_vim_regex_highlighting = false,
     },
   }
+
+  -- codeschool colorscheme config
+  vim.o.background = "dark"
+  vim.g.codeschool_contrast_dark = "hard"
+
+  -- Load and setup function to choose plugin and language highlights
+  require('lush')(require('codeschool').setup({
+    plugins = {
+      "buftabline",
+      "fzf",
+      "lsp",
+      "lspsaga",
+      "nerdtree",
+      "telescope",
+      "treesitter"
+    },
+    langs = {
+      "css",
+      "golang",
+      "html",
+      "js",
+      "json",
+      "lua",
+      "python",
+      "ruby",
+      "typescript",
+      "viml",
+    }
+  }))
 EOF
 
 autocmd BufWritePre *.tfvars lua vim.lsp.buf.format()
