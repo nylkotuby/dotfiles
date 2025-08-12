@@ -23,6 +23,7 @@ nnoremap <C-p> <cmd>Telescope find_files<cr>
 nnoremap <C-Space> <cmd>Telescope live_grep<cr>
 nnoremap <C-m> <cmd>Telescope buffers<cr>
 nnoremap <leader><space> <cmd>Telescope grep_string<cr>
+nnoremap <leader>z <cmd>Telescope grep_string search=<cr>
 
 " nerdtree
 map <C-n> :NERDTreeToggle<CR>
@@ -48,13 +49,13 @@ let test#strategy = "vimux"
 let g:VimuxHeight = "40%"
 
 call plug#begin()
+Plug 'adisen99/codeschool.nvim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
 Plug 'junegunn/goyo.vim'
 Plug 'MunifTanjim/nui.nvim'
 Plug 'rktjmp/lush.nvim'
-Plug 'adisen99/codeschool.nvim'
 "Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
@@ -64,6 +65,7 @@ Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'preservim/nerdtree'
 Plug 'preservim/vimux'
+Plug 'RRethy/nvim-treesitter-endwise'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
@@ -104,7 +106,7 @@ function! s:goyo_leave()
   endif
   set showcmd
   set scrolloff=5
-  colorscheme jellybeans
+  colorscheme codeschool
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -144,17 +146,17 @@ lua << EOF
     -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
     -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
     -- buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+    -- buf_set_keymap('n', '<leader>a', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
     buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     --buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-    buf_set_keymap('n', 'F', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+    buf_set_keymap('n', '<leader>a', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
     buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
     buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     -- buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-end
+  end
 
   -- run `gem install sorbet` for first-time setup
   nvim_lsp['sorbet'].setup {
@@ -176,6 +178,23 @@ end
     cmd = { "ember-language-server", "--stdio" },
     filetypes = { "handlebars", "typescript", "javascript", "typescript.glimmer", "javascript.glimmer" },
     root_dir = require('lspconfig.util').root_pattern("ember-cli-build.js", ".git")
+  }
+
+  -- run `go install golang.org/x/tools/gopls@latest` for first-time setup
+  -- https://github.com/golang/tools/blob/master/gopls/doc/index.md
+  nvim_lsp['gopls'].setup {
+    on_attach = on_attach,
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+        gofumpt = true,
+      },
+    },
+    cmd = {'gopls', '--remote=auto'},
+    filetypes = { "go", "gomod", "gowork", "gotmpl" },
   }
 
   require("telescope").setup({
@@ -210,7 +229,7 @@ end
 
   require('telescope').load_extension('fzf')
 
-  require'nvim-treesitter.configs'.setup {
+  require('nvim-treesitter.configs').setup {
     auto_install = true,
     highlight = {
       enable = true,
@@ -218,12 +237,20 @@ end
       -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
       -- Using this option may slow down your editor, and you may see some duplicate highlights.
       -- Instead of true it can also be a list of languages
-      additional_vim_regex_highlighting = false,
+      -- additional_vim_regex_highlighting = false,
+      additional_vim_regex_highlighting = { "ruby", "golang" },
     },
-    indent = { enable = true },
+    indent = {
+      enable = true,
+      disable = { "ruby" },
+    },
+    endwise = {
+      enable = true,
+    }
   }
 
   vim.opt.cindent = true
+  vim.cmd('autocmd FileType ruby setlocal indentkeys-=.')
 
   -- codeschool colorscheme config
   vim.o.background = "dark"
@@ -253,8 +280,38 @@ end
       "viml",
     }
   }))
+
+EOF
+
+lua << EOF
+  local format_on_save_group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
+
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = format_on_save_group,
+    pattern = "*.go",
+    callback = function()
+    local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+    local params = vim.lsp.util.make_range_params(0, enc)
+    params.context = {only = {"source.organizeImports"}}
+    -- buf_request_sync defaults to a 1000ms timeout. Depending on your
+    -- machine and codebase, you may want longer. Add an additional
+    -- argument after params if you find that you have to write the file
+    -- twice for changes to be saved.
+    -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+        end
+      end
+    end
+    vim.lsp.buf.format({async = false})
+    end,
+  })
 EOF
 
 autocmd BufWritePre *.tfvars lua vim.lsp.buf.format()
 autocmd BufWritePre *.tf lua vim.lsp.buf.format()
 "autocmd ColorScheme * runtime plugin/diagnostic.vim
+
