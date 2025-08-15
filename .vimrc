@@ -48,6 +48,18 @@ autocmd BufWinLeave * call clearmatches()
 let test#strategy = "vimux"
 let g:VimuxHeight = "40%"
 
+" vim-rails: direct :A / alt file to spec instead of test
+let g:rails_projections = {
+      \  'app/*.rb': {
+      \     'alternate': 'spec/{}_spec.rb',
+      \     'type': 'source'
+      \   },
+      \  'spec/*_spec.rb': {
+      \     'alternate': 'app/{}.rb',
+      \     'type': 'test'
+      \   },
+      \}
+
 call plug#begin()
 Plug 'adisen99/codeschool.nvim'
 Plug 'christoomey/vim-tmux-navigator'
