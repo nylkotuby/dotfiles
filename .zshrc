@@ -5,9 +5,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
-# init asdf
-. "/opt/homebrew/opt/asdf/libexec/asdf.sh"
-
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -104,6 +101,7 @@ autoload -U colors && colors
 alias v="nvim"
 alias g="git"
 alias tf="terraform"
+alias trace_env="zsh -xl 2>&1"
 
 alias new-uuid="uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '\n'"
 alias update-chromedriver="cd /opt/homebrew/Caskroom/chromedriver/*/chromedriver-mac-arm64/ && xattr -d com.apple.quarantine chromedriver && cd -"

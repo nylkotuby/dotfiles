@@ -135,8 +135,6 @@ lua << EOF
   -- alternatively, try virtual_text
   vim.diagnostic.config({virtual_lines=true})
 
-  local nvim_lsp = require('lspconfig')
-
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
@@ -171,30 +169,33 @@ lua << EOF
   end
 
   -- run `gem install sorbet` for first-time setup
-  nvim_lsp['sorbet'].setup {
+  vim.lsp.config('sorbet', {
     on_attach = on_attach,
     cmd = { "bundle", "exec", "srb", "tc", "--lsp"},
     flags = { debounce_text_changes = 150 }
-  }
+  })
+  vim.lsp.enable('sorbet')
 
-  nvim_lsp['rubocop'].setup {
+  vim.lsp.config('rubocop', {
     cmd = { "bundle", "exec", "rubocop", "--lsp" },
-  }
+  })
+  vim.lsp.enable('rubocop')
 
   -- run `brew install terraform`
-  nvim_lsp['terraformls'].setup {}
+  vim.lsp.enable('terraformls')
 
   -- run `npm install -g @ember-tooling/ember-language-server` for first-time setup
-  nvim_lsp['ember'].setup {
+  vim.lsp.config('ember', {
     on_attach = on_attach,
     cmd = { "ember-language-server", "--stdio" },
     filetypes = { "handlebars", "typescript", "javascript", "typescript.glimmer", "javascript.glimmer" },
     root_dir = require('lspconfig.util').root_pattern("ember-cli-build.js", ".git")
-  }
+  })
+  vim.lsp.enable('ember')
 
   -- run `go install golang.org/x/tools/gopls@latest` for first-time setup
   -- https://github.com/golang/tools/blob/master/gopls/doc/index.md
-  nvim_lsp['gopls'].setup {
+  vim.lsp.config('gopls', {
     on_attach = on_attach,
     settings = {
       gopls = {
@@ -207,7 +208,8 @@ lua << EOF
     },
     cmd = {'gopls', '--remote=auto'},
     filetypes = { "go", "gomod", "gowork", "gotmpl" },
-  }
+  })
+  vim.lsp.enable('gopls')
 
   require("telescope").setup({
     defaults = {
