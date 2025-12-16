@@ -60,6 +60,13 @@ let g:rails_projections = {
       \   },
       \}
 
+" install vim-plug if it doesn't already exist
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin()
 Plug 'adisen99/codeschool.nvim'
 Plug 'christoomey/vim-tmux-navigator'
@@ -243,7 +250,7 @@ lua << EOF
 
   require('telescope').load_extension('fzf')
 
-  require('nvim-treesitter.configs').setup {
+  require('nvim-treesitter').setup {
     auto_install = true,
     highlight = {
       enable = true,
@@ -297,6 +304,7 @@ lua << EOF
 
 EOF
 
+" reindent Golang code on save
 lua << EOF
   local format_on_save_group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
 

@@ -6,27 +6,46 @@ For OSX, I did `kitty` this time.
 
 * Download kitty
 * Download `Input` monospaced font, add to Font book, and do `kitten choose-font`
-* `kitten theme` -> jellybeans
+* `kitten theme` -> harper
 * Install brew, git, get ssh key set up
 
 ### Install needed apps
 On Ubuntu, some of these will be available via `apt`, but most will need to be installed by cloning the git repo.
-OSX has some, but not all, available via `brew`. Google 'em.
+OSX has almost everything available via `brew` - just grab [oh-my-zsh](https://ohmyz.sh/#install) externally.
 
 ```
 neovim
 tmux
 zsh
-oh-my-zsh
 asdf
-vim-plug
 fzf
 rg
+gcc (for nvim-treesitter) (maybe)
 ```
 
-For OSX, install `reattach-to-user-namespace` before launching tmux.
+For OSX, `brew install reattach-to-user-namespace` before launching tmux.
 For Ubuntu/WSL, remove the `reattach-to-user-namespace` call before launching tmux.
 Not doing either one will result in tmux exiting on startup. :)
+
+### Configure files
+The rest of this guide goes smoother with your keybinds in place. Link or copy the files like so.
+
+* `/solargraph` -> `~/.config/solargraph`
+  * We want to ignore the `rubocop` rules provided by the Solargraph LSP so we can use `standard` instead
+
+* `.vimrc` -> `~/.config/nvim/init.vim`
+  * :PlugInstall after running
+
+* `.zshrc` -> ~/.zshrc`
+  * clear out any unused language switching stuff if not using ruby/go
+
+* `.tmux.conf` -> `~/.tmux.conf`
+    * make sure to comment out `reattach-to-user-namespace` for WSL/Ubuntu
+
+* `.gitconfig` -> `~/.gitconfig`
+  * update any paths, emails etc.
+
+* `.gitmessage` -> `~/.gitmessage`
 
 ### Ruby dependencies
 For Ubuntu, you'll need to install these dependencies in order to build Ruby:
@@ -44,15 +63,14 @@ libreadline-dev
 
 You might also need `libtool`, but `psych` should be covered by `libyaml`.
 
-For OSX, install `libyaml` via brew to get `psych` to work.
-
+For OSX, install `libyaml` and `libpq` via brew to get `psych` to work.
 
 ### Install ruby & gems
 To install Ruby:
 ```
 asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
 asdf install ruby latest
-asdf global ruby latest
+asdf set --home ruby latest
 ```
 
 To run the LSPs and `standardrb` linter, `gem install` these gems:
@@ -63,21 +81,3 @@ standard
 
 Really, just go through the `init.nvim` and install all the gems/dependencies called out in the comments.
 
-Also, whatever languages you use, don't forget to `:TSInstall` for [TreeSitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#supported-languages) to have the parser ready.
-
-### Configure files
-Link or copy the files like so.
-
-* `/solargraph` -> `~/.config/solargraph`
-  * We want to ignore the `rubocop` rules provided by the Solargraph LSP so we can use `standard` instead
-
-* `.vimrc` -> `~/.config/nvim/init.vim`
-
-* `.zshrc` -> ~/.zshrc`
-  * clear out any unused language switching stuff if not using ruby/go
-
-* `.tmux.conf` -> `~/.tmux.conf`
-    * make sure to comment out `reattach-to-user-namespace` for WSL/Ubuntu
-
-* `.gitconfig` -> `~/.gitconfig`
-  * update any paths, emails etc.
