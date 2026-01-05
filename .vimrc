@@ -18,6 +18,8 @@ set nofoldenable
 
 let mapleader = ","
 
+nnoremap qq :noh<CR>
+
 " Find files using Telescope command-line sugar.
 nnoremap <C-p> <cmd>Telescope find_files<cr>
 nnoremap <C-Space> <cmd>Telescope live_grep<cr>
@@ -75,11 +77,10 @@ Plug 'jgdavey/vim-blockle'
 Plug 'junegunn/goyo.vim'
 Plug 'MunifTanjim/nui.nvim'
 Plug 'rktjmp/lush.nvim'
-"Plug 'nanotech/jellybeans.vim'
 Plug 'neovim/nvim-lspconfig'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '*' }
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'preservim/nerdtree'
@@ -169,8 +170,8 @@ lua << EOF
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     --buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
     buf_set_keymap('n', '<leader>a', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
     -- buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
   end
@@ -181,15 +182,13 @@ lua << EOF
     cmd = { "bundle", "exec", "srb", "tc", "--lsp"},
     flags = { debounce_text_changes = 150 }
   })
-  vim.lsp.enable('sorbet')
 
   vim.lsp.config('rubocop', {
     cmd = { "bundle", "exec", "rubocop", "--lsp" },
   })
-  vim.lsp.enable('rubocop')
 
   -- run `brew install terraform`
-  vim.lsp.enable('terraformls')
+  vim.lsp.enable({'sorbet', 'rubocop', 'terraformls', 'ember', 'gopls'})
 
   -- run `npm install -g @ember-tooling/ember-language-server` for first-time setup
   vim.lsp.config('ember', {
@@ -198,7 +197,6 @@ lua << EOF
     filetypes = { "handlebars", "typescript", "javascript", "typescript.glimmer", "javascript.glimmer" },
     root_dir = require('lspconfig.util').root_pattern("ember-cli-build.js", ".git")
   })
-  vim.lsp.enable('ember')
 
   -- run `go install golang.org/x/tools/gopls@latest` for first-time setup
   -- https://github.com/golang/tools/blob/master/gopls/doc/index.md
@@ -216,7 +214,6 @@ lua << EOF
     cmd = {'gopls', '--remote=auto'},
     filetypes = { "go", "gomod", "gowork", "gotmpl" },
   })
-  vim.lsp.enable('gopls')
 
   require("telescope").setup({
     defaults = {
@@ -302,6 +299,22 @@ lua << EOF
     }
   }))
 
+  -- ignore specs / tests in search
+  vim.keymap.set("n", "<C-Space>", function()
+    require("telescope.builtin").live_grep({
+      vimgrep_arguments = {
+        "rg",
+        "--color=never",
+        "--no-heading",
+        "--with-filename",
+        "--line-number",
+        "--column",
+        "--smart-case",
+        "-g", "!*_spec.rb",
+        "-g", "!*-test.js",
+      }
+    })
+  end)
 EOF
 
 " reindent Golang code on save
