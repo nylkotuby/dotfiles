@@ -69,7 +69,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 call plug#begin()
-Plug 'adisen99/codeschool.nvim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'itchyny/lightline.vim'
 Plug 'jgdavey/vim-blockle'
@@ -92,6 +91,7 @@ Plug 'tpope/vim-rails'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'luochen1990/rainbow'
+Plug 'vague-theme/vague.nvim'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-test/vim-test'
 call plug#end()
@@ -125,7 +125,7 @@ function! s:goyo_leave()
   endif
   set showcmd
   set scrolloff=5
-  colorscheme codeschool
+  colorscheme vague
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -188,7 +188,7 @@ lua << EOF
     on_attach = on_attach,
     cmd = { "ember-language-server", "--stdio" },
     filetypes = { "handlebars", "typescript", "javascript", "typescript.glimmer", "javascript.glimmer" },
-    root_dir = require('lspconfig.util').root_pattern("ember-cli-build.js", ".git")
+    root_markers = { "ember-cli-build.js", ".git" },
   })
 
   -- run `go install golang.org/x/tools/gopls@latest` for first-time setup
@@ -261,58 +261,59 @@ lua << EOF
     })
   end)
 
-  require('nvim-treesitter').setup {
-    auto_install = true,
-    highlight = {
-      enable = true,
-      -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-      -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-      -- Using this option may slow down your editor, and you may see some duplicate highlights.
-      -- Instead of true it can also be a list of languages
-      -- additional_vim_regex_highlighting = false,
-      additional_vim_regex_highlighting = { "ruby", "golang" },
-    },
-    indent = {
-      enable = true,
-      disable = { "ruby" },
-    },
-    endwise = {
-      enable = true,
-    }
+  local treesitter_languages = {
+    "css",
+    "glimmer",
+    "glimmer_javascript",
+    "glimmer_typescript",
+    "go",
+    "html",
+    "javascript",
+    "json",
+    "lua",
+    "python",
+    "ruby",
+    "terraform",
+    "tsx",
+    "typescript",
+    "vim",
+    "vimdoc",
   }
+
+  require("nvim-treesitter").install(treesitter_languages)
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = {
+      "css", "glimmer", "glimmer_javascript", "glimmer_typescript",
+      "go", "handlebars", "html", "html.handlebars",
+      "javascript", "javascript.glimmer", "javascriptreact",
+      "json", "lua", "python", "ruby", "terraform", "terraform-vars",
+      "tsx", "typescript", "typescript.glimmer", "typescriptreact",
+      "vim", "vimdoc",
+    },
+    callback = function(event)
+      local language = vim.treesitter.language.get_lang(event.match)
+      if not language then
+        return
+      end
+
+      if #vim.api.nvim_get_runtime_file("parser/" .. language .. ".*", false) == 0 then
+        vim.notify(
+          ("Tree-sitter parser '%s' is not installed yet; run :TSInstall %s."):format(language, language),
+          vim.log.levels.WARN
+        )
+        return
+      end
+
+      vim.treesitter.start(event.buf, language)
+    end,
+  })
 
   require('telescope').load_extension('fzf')
   vim.opt.cindent = true
   vim.cmd('autocmd FileType ruby setlocal indentkeys-=.')
-
-  -- codeschool colorscheme config
-  vim.o.background = "dark"
-  vim.g.codeschool_contrast_dark = "hard"
-
-  -- Load and setup function to choose plugin and language highlights
-  require('lush')(require('codeschool').setup({
-    plugins = {
-      "buftabline",
-      "fzf",
-      "lsp",
-      "lspsaga",
-      "nerdtree",
-      "telescope",
-      "treesitter"
-    },
-    langs = {
-      "css",
-      "golang",
-      "html",
-      "js",
-      "json",
-      "lua",
-      "python",
-      "ruby",
-      "typescript",
-      "viml",
-    }
-  }))
+  require('vague').setup({})
+  vim.cmd.colorscheme('vague')
 
 EOF
 
