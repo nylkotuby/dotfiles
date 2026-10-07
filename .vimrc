@@ -21,10 +21,7 @@ nnoremap qq :noh<CR>
 
 " Find files using Telescope command-line sugar.
 nnoremap <C-p> <cmd>Telescope find_files<cr>
-nnoremap <leader><space> <cmd>Telescope live_grep<cr>
 nnoremap <C-m> <cmd>Telescope buffers<cr>
-" nnoremap <leader><space> <cmd>Telescope grep_string<cr>
-nnoremap <leader>z <cmd>Telescope grep_string search=<cr>
 
 " nerdtree
 map <C-n> :NERDTreeToggle<CR>
@@ -83,6 +80,7 @@ Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'main', 'do': ':TSUpdate'}
 Plug 'preservim/nerdtree'
 Plug 'preservim/vimux'
+Plug 'rebelot/kanagawa.nvim'
 Plug 'RRethy/nvim-treesitter-endwise'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-dispatch'
@@ -91,7 +89,6 @@ Plug 'tpope/vim-rails'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'luochen1990/rainbow'
-Plug 'vague-theme/vague.nvim'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-test/vim-test'
 call plug#end()
@@ -125,7 +122,7 @@ function! s:goyo_leave()
   endif
   set showcmd
   set scrolloff=5
-  colorscheme vague
+  colorscheme kanagawa
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -261,6 +258,12 @@ lua << EOF
     })
   end)
 
+  vim.keymap.set("n", "<leader>z", function()
+    require("telescope.builtin").grep_string({
+      default_text = vim.fn.expand("<cword>")
+    })
+  end)
+
   local treesitter_languages = {
     "css",
     "glimmer",
@@ -312,8 +315,7 @@ lua << EOF
   require('telescope').load_extension('fzf')
   vim.opt.cindent = true
   vim.cmd('autocmd FileType ruby setlocal indentkeys-=.')
-  require('vague').setup({})
-  vim.cmd.colorscheme('vague')
+  vim.cmd("colorscheme kanagawa-wave")
 
 EOF
 
@@ -335,5 +337,3 @@ EOF
 
 autocmd BufWritePre *.tfvars lua vim.lsp.buf.format()
 autocmd BufWritePre *.tf lua vim.lsp.buf.format()
-"autocmd ColorScheme * runtime plugin/diagnostic.vim
-
